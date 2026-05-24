@@ -308,33 +308,37 @@ function renderUpcomingEvents() {
   const TAG_LABEL = { competition:'Competition', workshop:'Workshop', meeting:'Meeting', deadline:'Deadline', other:'Other' };
   if (!events.length) {
     container.innerHTML = '<p style="color:var(--dim);font-size:.82rem;padding:8px 0;text-align:center">No upcoming events scheduled.</p>';
-    return;
+  } else {
+    container.innerHTML = events.map(ev => {
+      const d = new Date(ev.date + 'T00:00:00');
+      const tc = TAG_CLASS[ev.type] || 't-other';
+      const tl = TAG_LABEL[ev.type] || 'Event';
+      const loc = ev.location ? ` · ${ev.location}` : '';
+      const time = ev.time ? ` · ${ev.time}` : '';
+      return `<div class="ev-item">
+        <div class="ev-date"><div class="month">${EV_MONTHS_SHORT[d.getMonth()]}</div><div class="day">${d.getDate()}</div></div>
+        <div class="ev-info">
+          <h4>${ev.title}</h4>
+          <p>${ev.desc || ''}${loc}${time}</p>
+          <span class="etag ${tc}">${tl}</span>
+        </div>
+      </div>`;
+    }).join('');
   }
-  container.innerHTML = events.map(ev => {
-    const d = new Date(ev.date + 'T00:00:00');
-    const tc = TAG_CLASS[ev.type] || 't-other';
-    const tl = TAG_LABEL[ev.type] || 'Event';
-    const loc = ev.location ? ` · ${ev.location}` : '';
-    const time = ev.time ? ` · ${ev.time}` : '';
-    return `<div class="ev-item">
-      <div class="ev-date"><div class="month">${EV_MONTHS_SHORT[d.getMonth()]}</div><div class="day">${d.getDate()}</div></div>
-      <div class="ev-info">
-        <h4>${ev.title}</h4>
-        <p>${ev.desc || ''}${loc}${time}</p>
-        <span class="etag ${tc}">${tl}</span>
-      </div>
-    </div>`;
-  }).join('');
-
-  // Update stat card
-  const statEl = document.querySelector('.sc .val');
-  // find the "Upcoming Events" stat card specifically
+  // Update "Upcoming Events" stat card
   document.querySelectorAll('.sc').forEach(sc => {
-    if (sc.querySelector('.lbl') && sc.querySelector('.lbl').textContent === 'Upcoming Events') {
+    const lbl = sc.querySelector('.lbl');
+    if (lbl && lbl.textContent === 'Upcoming Events') {
       sc.querySelector('.val').textContent = events.length;
     }
   });
 }
+
+// Re-render calendar and events whenever admin updates localStorage from another tab
+window.addEventListener('storage', e => {
+  if (e.key === 'rcn_events') { renderCal(); renderUpcomingEvents(); }
+});
+
 renderUpcomingEvents();
 
 // ── LOGOUT ────────────────────────────────────────────────────

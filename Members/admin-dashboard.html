@@ -76,6 +76,9 @@
     .field{margin-bottom:13px}
     .field label{display:block;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin-bottom:5px}
     .field input,.field select{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:9px;padding:9px 12px;color:#fff;font-size:.85rem;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;appearance:none}
+    .field select option{background:#1a1530;color:#fff}
+    .field select option:disabled{color:rgba(200,195,232,.35)}
+    .time-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
     .field input::placeholder{color:rgba(200,195,232,.22)}
     .field input:focus,.field select:focus{border-color:rgba(249,115,22,.5)}
     .field .hint{font-size:.67rem;color:var(--dim);margin-top:3px}
@@ -373,7 +376,13 @@
     <div class="field"><label>Description</label><textarea id="ae-desc" placeholder="Brief description of the event…"></textarea></div>
     <div class="row-2">
       <div class="field"><label>Date</label><input type="date" id="ae-date"></div>
-      <div class="field"><label>Time</label><input type="time" id="ae-time"></div>
+      <div class="field"><label>Time (optional)</label>
+        <div class="time-row">
+          <select id="ae-hour"><option value="">HH</option><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
+          <select id="ae-min"><option value="">MM</option><option>00</option><option>05</option><option>10</option><option>15</option><option>20</option><option>25</option><option>30</option><option>35</option><option>40</option><option>45</option><option>50</option><option>55</option></select>
+          <select id="ae-ampm"><option value="">AM/PM</option><option>AM</option><option>PM</option></select>
+        </div>
+      </div>
     </div>
     <div class="field"><label>Location / Venue</label><input type="text" id="ae-location" placeholder="e.g. Lab 3, Main Block"></div>
     <div class="field"><label>Event Type</label>
@@ -400,7 +409,13 @@
     <div class="field"><label>Description</label><textarea id="ee-desc" placeholder="Brief description…"></textarea></div>
     <div class="row-2">
       <div class="field"><label>Date</label><input type="date" id="ee-date"></div>
-      <div class="field"><label>Time</label><input type="time" id="ee-time"></div>
+      <div class="field"><label>Time (optional)</label>
+        <div class="time-row">
+          <select id="ee-hour"><option value="">HH</option><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option></select>
+          <select id="ee-min"><option value="">MM</option><option>00</option><option>05</option><option>10</option><option>15</option><option>20</option><option>25</option><option>30</option><option>35</option><option>40</option><option>45</option><option>50</option><option>55</option></select>
+          <select id="ee-ampm"><option value="">AM/PM</option><option>AM</option><option>PM</option></select>
+        </div>
+      </div>
     </div>
     <div class="field"><label>Location / Venue</label><input type="text" id="ee-location" placeholder="e.g. Seminar Hall"></div>
     <div class="field"><label>Event Type</label>
@@ -758,7 +773,10 @@ function saveEvent() {
   const title    = document.getElementById('ae-title').value.trim();
   const desc     = document.getElementById('ae-desc').value.trim();
   const date     = document.getElementById('ae-date').value;
-  const time     = document.getElementById('ae-time').value;
+  const hour     = document.getElementById('ae-hour').value;
+  const min      = document.getElementById('ae-min').value;
+  const ampm     = document.getElementById('ae-ampm').value;
+  const time     = (hour && min && ampm) ? `${hour}:${min} ${ampm}` : '';
   const location = document.getElementById('ae-location').value.trim();
   const type     = document.getElementById('ae-type').value;
   if (!title || !date || !type) { showAlert('ae-error','Title, date, and type are required.'); return; }
@@ -766,8 +784,8 @@ function saveEvent() {
   events.push({ id: 'EV'+Date.now(), title, desc, date, time, location, type, createdAt: new Date().toISOString() });
   saveEvents(events);
   closeModal('add-event-modal');
-  ['ae-title','ae-desc','ae-date','ae-time','ae-location'].forEach(id => document.getElementById(id).value='');
-  document.getElementById('ae-type').value='';
+  ['ae-title','ae-desc','ae-date','ae-location'].forEach(id => document.getElementById(id).value='');
+  ['ae-type','ae-hour','ae-min','ae-ampm'].forEach(id => document.getElementById(id).value='');
   renderEvents();
 }
 
@@ -778,9 +796,17 @@ function openEditEvent(id) {
   document.getElementById('ee-title').value    = ev.title;
   document.getElementById('ee-desc').value     = ev.desc || '';
   document.getElementById('ee-date').value     = ev.date;
-  document.getElementById('ee-time').value     = ev.time || '';
   document.getElementById('ee-location').value = ev.location || '';
   document.getElementById('ee-type').value     = ev.type || '';
+  // Parse stored time string e.g. "09:30 AM"
+  if (ev.time) {
+    const parts = ev.time.split(/[: ]/);
+    document.getElementById('ee-hour').value  = parts[0] || '';
+    document.getElementById('ee-min').value   = parts[1] || '';
+    document.getElementById('ee-ampm').value  = parts[2] || '';
+  } else {
+    ['ee-hour','ee-min','ee-ampm'].forEach(id => document.getElementById(id).value='');
+  }
   hideAlert('ee-error');
   openModal('edit-event-modal');
 }
@@ -791,7 +817,10 @@ function updateEvent() {
   const title    = document.getElementById('ee-title').value.trim();
   const desc     = document.getElementById('ee-desc').value.trim();
   const date     = document.getElementById('ee-date').value;
-  const time     = document.getElementById('ee-time').value;
+  const hour     = document.getElementById('ee-hour').value;
+  const min      = document.getElementById('ee-min').value;
+  const ampm     = document.getElementById('ee-ampm').value;
+  const time     = (hour && min && ampm) ? `${hour}:${min} ${ampm}` : '';
   const location = document.getElementById('ee-location').value.trim();
   const type     = document.getElementById('ee-type').value;
   if (!title || !date || !type) { showAlert('ee-error','Title, date, and type are required.'); return; }
