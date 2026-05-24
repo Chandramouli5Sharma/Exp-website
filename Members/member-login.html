@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Login · Robotics Club Nitte</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0812;--surface:rgba(14,11,26,0.98);--border:rgba(255,255,255,0.07);--text:#c8c3e8;--dim:rgba(200,195,232,0.45);--orange:#f97316;--blue:#3b82f6;--purple:#7c3aed;--green:#10b981;--red:#ef4444;--cyan:#06b6d4}
+    html,body{height:100%}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;display:flex;flex-direction:column}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(59,130,246,.07) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(124,58,237,.07) 0%,transparent 60%);pointer-events:none;z-index:0}
+
+    #topbar{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;background:rgba(10,8,18,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+    .brand{font-family:'Inter',sans-serif;font-weight:800;font-size:.95rem;color:#fff;text-decoration:none;position:absolute;left:50%;transform:translateX(-50%)}.brand span{color:var(--blue)}
+    .back-btn{width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(249,115,22,.12);display:flex;align-items:center;justify-content:center;color:var(--orange);text-decoration:none;transition:background .2s}.back-btn:hover{background:rgba(249,115,22,.25)}
+
+    main{flex:1;display:flex;align-items:center;justify-content:center;padding:90px 20px 48px;position:relative;z-index:1}
+    .auth-container{width:100%;max-width:460px}
+    .auth-header{text-align:center;margin-bottom:26px}
+    .auth-header .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.22);border-radius:20px;padding:5px 14px;font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#60a5fa;margin-bottom:12px}
+    .auth-header h1{font-family:'Space Grotesk',sans-serif;font-size:1.9rem;font-weight:700;color:#fff;letter-spacing:-.03em;margin-bottom:6px}
+    .auth-header p{font-size:.86rem;color:var(--dim)}
+
+    .auth-card{background:rgba(14,11,26,.9);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:28px 30px;backdrop-filter:blur(24px);box-shadow:0 24px 80px rgba(0,0,0,.5)}
+
+    .tabs{display:grid;grid-template-columns:1fr 1fr;background:rgba(255,255,255,.04);border-radius:12px;padding:4px;margin-bottom:22px;gap:4px}
+    .tab-btn{border:none;background:transparent;cursor:pointer;padding:8px;border-radius:9px;font-family:'Inter',sans-serif;font-size:.84rem;font-weight:600;color:var(--dim);transition:all .2s}
+    .tab-btn.active{background:var(--blue);color:#fff;box-shadow:0 2px 12px rgba(59,130,246,.4)}
+
+    .panel{display:none}.panel.active{display:block}
+
+    .field{margin-bottom:13px}
+    .field label{display:block;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin-bottom:5px}
+    .field input,.field select{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:9px 13px;color:#fff;font-size:.87rem;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none}
+    .field input::placeholder{color:rgba(200,195,232,.22)}
+    .field input:focus,.field select:focus{border-color:rgba(59,130,246,.5);box-shadow:0 0 0 3px rgba(59,130,246,.08)}
+    .field .hint{font-size:.68rem;color:var(--dim);margin-top:3px}
+    .row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+    .pw-wrap{position:relative}.pw-wrap input{padding-right:42px}
+    .pw-toggle{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--dim);display:flex;align-items:center;transition:color .2s}.pw-toggle:hover{color:var(--text)}
+
+    .btn-primary{width:100%;padding:11px;background:linear-gradient(135deg,var(--blue),var(--purple));border:none;border-radius:11px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.88rem;font-weight:700;color:#fff;letter-spacing:.02em;transition:opacity .2s,transform .15s,box-shadow .2s;box-shadow:0 4px 20px rgba(59,130,246,.3)}
+    .btn-primary:hover{opacity:.9;transform:translateY(-1px)}.btn-primary:active{transform:translateY(0)}.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+    .alert{border-radius:10px;padding:10px 14px;font-size:.82rem;margin-bottom:16px;display:none}
+    .alert.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#fca5a5}
+    .alert.success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#6ee7b7}
+    .alert.warning{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);color:#fdba74}
+
+    .pending-box{text-align:center;padding:22px;border-radius:14px;background:rgba(249,115,22,.07);border:1px solid rgba(249,115,22,.2);display:none}
+    .pending-box .icon{width:52px;height:52px;border-radius:50%;background:rgba(249,115,22,.15);margin:0 auto 11px;display:flex;align-items:center;justify-content:center}
+    .pending-box h3{font-size:.96rem;font-weight:700;color:#fdba74;margin-bottom:7px}
+    .pending-box p{font-size:.78rem;color:var(--dim);line-height:1.6}
+
+    .auth-footer{text-align:center;margin-top:13px;font-size:.76rem;color:var(--dim)}
+    .auth-footer a{color:#60a5fa;text-decoration:none}.auth-footer a:hover{text-decoration:underline}
+
+    .admin-link-row{margin-top:18px;text-align:center;padding-top:16px;border-top:1px solid var(--border)}
+    .admin-link-row a{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:var(--dim);text-decoration:none;transition:color .2s}.admin-link-row a:hover{color:var(--orange)}
+
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ADMIN MODAL */
+    #admin-modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);align-items:center;justify-content:center}
+    #admin-modal.open{display:flex}
+    .modal-box{background:#0e0b1a;border:1px solid rgba(249,115,22,.22);border-radius:20px;padding:28px;width:100%;max-width:380px;margin:20px}
+    .modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .modal-hdr h2{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+    .modal-hdr .abadge{background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);border-radius:5px;padding:2px 7px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--orange)}
+    .close-btn{background:none;border:none;cursor:pointer;color:var(--dim);display:flex}.close-btn:hover{color:var(--text)}
+  </style>
+</head>
+<body>
+
+<div id="topbar">
+  <a href="../index.html" class="back-btn" aria-label="Back">
+    <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 19l-7-7 7-7"/></svg>
+  </a>
+  <a href="../index.html" class="brand">Robotics Club <span>Nitte</span></a>
+  <div style="width:40px"></div>
+</div>
+
+<main>
+  <div class="auth-container">
+    <div class="auth-header">
+      <div class="badge">
+        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        Members Area
+      </div>
+      <h1>Welcome Back</h1>
+      <p>Access the Robotics Club Nitte member portal</p>
+    </div>
+
+    <div class="auth-card">
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- ── LOGIN ── -->
+      <div class="panel active" id="panel-login">
+        <div class="alert error"   id="login-error"></div>
+        <div class="alert success" id="login-success"></div>
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="login-username" placeholder="Your username" autocomplete="username" onkeydown="if(event.key==='Enter')handleLogin()">
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLogin()">
+            <button class="pw-toggle" type="button" onclick="togglePw('login-password')" tabindex="-1">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+        </div>
+        <button class="btn-primary" id="login-btn" onclick="handleLogin()">Sign In</button>
+        <div class="auth-footer" style="margin-top:12px"><a href="#" onclick="showForgotPassword();return false">Forgot password?</a></div>
+        <div class="admin-link-row">
+          <a href="#" onclick="openAdminModal();return false">
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            Admin Access
+          </a>
+        </div>
+      </div>
+
+      <!-- ── SIGNUP ── -->
+      <div class="panel" id="panel-signup">
+        <div class="alert error" id="signup-error"></div>
+        <div class="pending-box" id="pending-box">
+          <div class="icon"><svg width="25" height="25" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <h3>Registration Submitted!</h3>
+          <p>Your signup request has been sent to the admin. You'll get access once approved — return here to sign in.</p>
+        </div>
+        <div id="signup-form-wrap">
+          <div class="row-2">
+            <div class="field"><label>Full Name</label><input type="text" id="su-name" placeholder="Full name"></div>
+            <div class="field"><label>Username</label><input type="text" id="su-username" placeholder="Choose a username"></div>
+          </div>
+          <div class="field">
+            <label>College Email</label>
+            <input type="email" id="su-email" placeholder="yourname@nmamit.in">
+            <div class="hint">Must be @nmamit.in or @nitte.edu.in</div>
+          </div>
+          <div class="row-2">
+            <div class="field"><label>USN</label><input type="text" id="su-usn" placeholder="e.g. NNM24CC010" style="text-transform:uppercase"></div>
+            <div class="field"><label>Phone Number</label><input type="tel" id="su-phone" placeholder="10-digit mobile" maxlength="10"></div>
+          </div>
+          <div class="field">
+              <label>Department</label>
+              <select id="su-dept">
+                <option value="">Department</option>
+                <option>Artificial Intelligence &amp; Data Science</option>
+                <option>Artificial Intelligence &amp; Machine Learning</option>
+                <option>Biotechnology</option>
+                <option>Civil Engineering</option>
+                <option>Computer &amp; Communication Engineering</option>
+                <option>Computer Science &amp; Engineering</option>
+                <option>Computer Science &amp; Engineering (Cyber Security)</option>
+                <option>Electrical &amp; Electronics Engineering</option>
+                <option>Electronics &amp; Communication Engineering</option>
+                <option>Electronics Engineering (VLSI Design &amp; Technology)</option>
+                <option>Electronics &amp; Communication (Advanced Communication Technology)</option>
+                <option>Information Science &amp; Engineering</option>
+                <option>Mechanical Engineering</option>
+                <option>Robotics &amp; Artificial Intelligence</option>
+              </select>
+            </div>
+          <div class="field">
+            <label>Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="su-password" placeholder="Min 8 characters">
+              <button class="pw-toggle" type="button" onclick="togglePw('su-password')" tabindex="-1">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Confirm Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="su-confirm" placeholder="Re-enter password">
+              <button class="pw-toggle" type="button" onclick="togglePw('su-confirm')" tabindex="-1">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+          </div>
+          <button class="btn-primary" id="signup-btn" onclick="handleSignup()">Request Access</button>
+          <div class="auth-footer">Already have an account? <a href="#" onclick="switchTab('login');return false">Sign In</a></div>
+        </div>
+      </div>
+    </div><!-- /auth-card -->
+  </div>
+</main>
+
+<!-- ── ADMIN MODAL ── -->
+<div id="admin-modal" onclick="if(event.target===this)closeAdminModal()">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h2><span class="abadge">Admin</span>Secure Access</h2>
+      <button class="close-btn" onclick="closeAdminModal()"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="alert error" id="admin-modal-error"></div>
+    <div class="field">
+      <label>Admin Username</label>
+      <input type="text" id="am-user" placeholder="Admin username" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="pw-wrap">
+        <input type="password" id="am-pass" placeholder="Admin password" onkeydown="if(event.key==='Enter')handleAdminLogin()">
+        <button class="pw-toggle" type="button" onclick="togglePw('am-pass')" tabindex="-1">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        </button>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="handleAdminLogin()" style="background:linear-gradient(135deg,#f97316,#dc2626);box-shadow:0 4px 20px rgba(249,115,22,.3)">Enter Admin Dashboard</button>
+  </div>
+</div>
+
+<!-- Shared core: hashing, data helpers, default seeds, UI utils -->
+<script src="rcn-core.js"></script>
+
+<script>
+// ── PAGE-SPECIFIC LOGIC : member-login.html ───────────────────
+
+// Redirect if already logged in as member
+// Redirect if already logged in as member (persistent 7-day session)
+const _existingSession = localStorage.getItem('rcn_member_session');
+if (_existingSession) {
+  try {
+    const _s = JSON.parse(_existingSession);
+    if (_s.expiresAt && Date.now() < _s.expiresAt) {
+      window.location.href = 'member-dashboard.html';
+    } else {
+      localStorage.removeItem('rcn_member_session');
+    }
+  } catch(e) { localStorage.removeItem('rcn_member_session'); }
+}
+
+// ── TAB SWITCHER ──────────────────────────────────────────────
+function switchTab(tab) {
+  ['login', 'signup'].forEach(t => {
+    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+    document.getElementById('tab-'   + t).classList.toggle('active', t === tab);
+  });
+  ['login-error', 'login-success', 'signup-error'].forEach(hideAlert);
+}
+
+// ── MEMBER LOGIN ──────────────────────────────────────────────
+function handleLogin() {
+  hideAlert('login-error'); hideAlert('login-success');
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!username || !password) { showAlert('login-error', 'Please enter your username and password.'); return; }
+
+  const btn = document.getElementById('login-btn');
+  btn.innerHTML = '<span class="spinner"></span>Signing in…'; btn.disabled = true;
+
+  setTimeout(() => {
+    btn.innerHTML = 'Sign In'; btn.disabled = false;
+    const members = getMembers();
+    const member  = members.find(m =>
+      m.username.toLowerCase() === username.toLowerCase() &&
+      m.passwordHash === hashPw(username, password)
+    );
+    if (!member)                    { showAlert('login-error', 'Invalid username or password.'); return; }
+    if (member.status === 'pending'){ showAlert('login-error', '⏳ Awaiting admin approval. Check back later.', 'warning'); return; }
+    if (member.status === 'blocked'){ showAlert('login-error', '🚫 Account suspended. Contact the admin.'); return; }
+
+    member.lastLogin  = new Date().toISOString();
+    member.loginCount = (member.loginCount || 0) + 1;
+    saveMembers(members);
+    logToSheets(member);
+    const sessionData = { member: member, expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 };
+    localStorage.setItem('rcn_member_session', JSON.stringify(sessionData));
+    showAlert('login-success', '✓ Welcome back, ' + member.name + '! Redirecting…', 'success');
+    setTimeout(() => { window.location.href = 'member-dashboard.html'; }, 1100);
+  }, 600);
+}
+
+// ── MEMBER SIGNUP ─────────────────────────────────────────────
+function handleSignup() {
+  hideAlert('signup-error');
+  const name     = document.getElementById('su-name').value.trim();
+  const username = document.getElementById('su-username').value.trim();
+  const email    = document.getElementById('su-email').value.trim().toLowerCase();
+  const usn      = document.getElementById('su-usn').value.trim().toUpperCase();
+  const phone    = document.getElementById('su-phone').value.trim();
+  const dept     = document.getElementById('su-dept').value;
+  const pass     = document.getElementById('su-password').value;
+  const conf     = document.getElementById('su-confirm').value;
+
+  if (!name||!username||!email||!usn||!phone||!dept||!pass||!conf) { showAlert('signup-error', 'All fields are required.'); return; }
+  if (!email.endsWith('@nmamit.in') && !email.endsWith('@nitte.edu.in'))  { showAlert('signup-error', 'Only @nmamit.in or @nitte.edu.in emails accepted.'); return; }
+  if (!/^\d{10}$/.test(phone))   { showAlert('signup-error', 'Phone must be exactly 10 digits.'); return; }
+  if (pass.length < 8)           { showAlert('signup-error', 'Password must be at least 8 characters.'); return; }
+  if (pass !== conf)             { showAlert('signup-error', 'Passwords do not match.'); return; }
+
+  const members = getMembers();
+  if (members.find(m => m.username.toLowerCase() === username.toLowerCase())) { showAlert('signup-error', 'Username already taken. Choose another.'); return; }
+  if (members.find(m => m.email === email))  { showAlert('signup-error', 'This email is already registered.'); return; }
+  if (members.find(m => m.usn   === usn))    { showAlert('signup-error', 'This USN is already registered.'); return; }
+
+  const btn = document.getElementById('signup-btn');
+  btn.innerHTML = '<span class="spinner"></span>Submitting…'; btn.disabled = true;
+  setTimeout(() => {
+    members.push({
+      id: 'M' + Date.now(), name, username, email, usn, phone, dept,
+      passwordHash: hashPw(username, pass),
+      status: 'pending', joinDate: new Date().toISOString(), lastLogin: null, loginCount: 0,
+    });
+    saveMembers(members);
+    btn.innerHTML = 'Request Access'; btn.disabled = false;
+    document.getElementById('signup-form-wrap').style.display = 'none';
+    document.getElementById('pending-box').style.display = 'block';
+  }, 700);
+}
+
+// ── ADMIN MODAL ───────────────────────────────────────────────
+function openAdminModal()  { document.getElementById('admin-modal').classList.add('open'); setTimeout(() => document.getElementById('am-user').focus(), 100); }
+function closeAdminModal() { document.getElementById('admin-modal').classList.remove('open'); hideAlert('admin-modal-error'); }
+
+function handleAdminLogin() {
+  const user = document.getElementById('am-user').value.trim();
+  const pass = document.getElementById('am-pass').value;
+  if (!user || !pass) { showAlert('admin-modal-error', 'Enter username and password.'); return; }
+  const admins = getAdmins();
+  const admin  = admins.find(a => a.username.toLowerCase() === user.toLowerCase() && a.passwordHash === hashPw(user, pass));
+  if (!admin) { showAlert('admin-modal-error', 'Invalid admin credentials.'); return; }
+  admin.lastLogin = new Date().toISOString();
+  saveAdmins(admins);
+  sessionStorage.setItem('rcn_admin', JSON.stringify(admin));
+  window.location.href = 'admin-dashboard.html';
+}
+
+// ── FORGOT PASSWORD ───────────────────────────────────────────
+function showForgotPassword() {
+  const u = document.getElementById('login-username').value.trim();
+  if (!u) { showAlert('login-error', 'Enter your username first.', 'warning'); return; }
+  if (!getMembers().find(m => m.username.toLowerCase() === u.toLowerCase())) { showAlert('login-error', 'Username not found.'); return; }
+  showAlert('login-success', '📧 Contact the club admin to reset your password. Email: nnm24cc010@nmamit.in', 'success');
+}
+</script>
+</body>
+</html>

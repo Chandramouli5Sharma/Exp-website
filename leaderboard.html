@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z9SRW3KV80"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Z9SRW3KV80');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Leaderboard — Robotics Club Nitte</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Sans+3:ital,wght@0,300;0,400;0,600&display=swap" rel="stylesheet">
+  <!-- Tailwind compiled CSS (run: npm run dev) -->
+  <link rel="stylesheet" href="./dist/output.css">
+  <!-- Custom styles (colours, animations, components) -->
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Page-specific ── */
+    .bot-card {
+      background: #110e1f;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 18px;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .bot-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 56px rgba(0,0,0,0.5), 0 0 0 1px rgba(249,115,22,0.2);
+    }
+    .bot-photo {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      background: #0d0a1a;
+      display: block;
+    }
+    .bot-photo-placeholder {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, #110e1f 0%, #1a1630 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .bot-photo-placeholder svg { color: rgba(249,115,22,0.25); }
+    .bot-photo-placeholder span { font-size: 0.72rem; color: rgba(200,195,232,0.25); letter-spacing: 0.08em; text-transform: uppercase; }
+    .bot-body { padding: 20px 20px 22px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .bot-name { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.1rem; color: #fff; margin: 0; }
+    .bot-division {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 99px;
+      background: rgba(249,115,22,0.1);
+      border: 1px solid rgba(249,115,22,0.25);
+      color: #f97316;
+      width: fit-content;
+    }
+    .win-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    .win-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: rgba(200,195,232,0.78);
+      line-height: 1.5;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.025);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.045);
+    }
+    .win-medal { font-size: 1rem; flex-shrink: 0; }
+    .win-text strong { color: #e2e8f0; font-weight: 600; }
+    .win-text span { display: block; font-size: 0.75rem; color: rgba(200,195,232,0.45); margin-top: 1px; }
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .stat-gold   { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+    .stat-silver { background: rgba(148,163,184,0.12); color: #94a3b8; border: 1px solid rgba(148,163,184,0.25); }
+    .stat-bronze { background: rgba(234,88,12,0.12);  color: #fb923c; border: 1px solid rgba(234,88,12,0.25); }
+    .rank-badge {
+      position: absolute;
+      top: 12px; left: 12px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: 0.85rem;
+      z-index: 2;
+    }
+    .rank-1 { background: linear-gradient(135deg,#fbbf24,#f59e0b); color: #000; box-shadow: 0 0 16px rgba(251,191,36,0.5); }
+    .rank-2 { background: linear-gradient(135deg,#94a3b8,#64748b); color: #fff; box-shadow: 0 0 12px rgba(148,163,184,0.3); }
+    .rank-3 { background: linear-gradient(135deg,#fb923c,#ea580c); color: #fff; box-shadow: 0 0 12px rgba(249,115,22,0.4); }
+    .rank-n { background: rgba(255,255,255,0.08); color: rgba(200,195,232,0.6); border: 1px solid rgba(255,255,255,0.1); }
+    .placeholder-notice {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 16px 20px;
+      background: rgba(249,115,22,0.07);
+      border: 1px dashed rgba(249,115,22,0.25);
+      border-radius: 12px;
+      margin-bottom: 40px;
+    }
+    .placeholder-notice p { font-size: 0.86rem; color: rgba(200,195,232,0.6); line-height: 1.6; margin: 0; }
+    .placeholder-notice strong { color: #f97316; }
+    .filter-btn {
+      padding: 7px 16px;
+      border-radius: 99px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: rgba(200,195,232,0.65);
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(249,115,22,0.15);
+      border-color: rgba(249,115,22,0.4);
+      color: #f97316;
+    }
+  </style>
+</head>
+<body style="background-color:#0a0812;color:#c8c3e8;font-family:'Source Sans 3','Inter',sans-serif;">
+
+<!-- ══ STICKY TOPBAR ══ -->
+<div id="topbar" style="position:fixed;top:0;left:0;right:0;z-index:300;height:64px;background:rgba(10,8,18,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;padding:0 16px;">
+  <a id="back-btn" href="index.html" aria-label="Go back" style="width:40px;height:40px;border-radius:10px;border:1px solid rgba(249,115,22,0.35);background:rgba(249,115,22,0.12);display:flex;align-items:center;justify-content:center;color:#f97316;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='rgba(249,115,22,0.25)'" onmouseout="this.style.background='rgba(249,115,22,0.12)'">
+    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 19l-7-7 7-7"/></svg>
+  </a>
+  <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:8px;position:absolute;left:50%;transform:translateX(-50%);">
+    <span style="font-family:'Inter',sans-serif;font-weight:800;font-size:0.95rem;color:#fff;letter-spacing:-0.01em;">Robotics Club <span style="color:#3b82f6;">Nitte</span></span>
+  </a>
+  <button id="sidebar-toggle" aria-label="Open navigation" style="width:46px;height:46px;border-radius:12px;border:2px solid #f97316;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#f97316;transition:box-shadow 0.2s,transform 0.15s;box-shadow:0 0 10px rgba(249,115,22,0.4),inset 0 0 10px rgba(249,115,22,0.05);" onmouseover="this.style.boxShadow='0 0 20px rgba(249,115,22,0.75),inset 0 0 14px rgba(249,115,22,0.1)';this.style.transform='scale(1.05)'" onmouseout="this.style.boxShadow='0 0 10px rgba(249,115,22,0.4),inset 0 0 10px rgba(249,115,22,0.05)';this.style.transform='scale(1)'">
+    <svg id="icon-open"  width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    <svg id="icon-close" width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+  </button>
+</div>
+
+<!-- ══ SIDEBAR BACKDROP ══ -->
+<div id="sidebar-backdrop" style="position:fixed;inset:0;z-index:310;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity 0.3s ease;"></div>
+
+<!-- ══ SIDE PANEL ══ -->
+<nav id="sidebar" style="position:fixed;top:0;left:0;height:100vh;width:280px;z-index:320;background:rgba(14,11,26,0.98);backdrop-filter:blur(24px);border-right:1px solid rgba(255,255,255,0.07);transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;overflow-y:auto;">
+  <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;">
+    <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      <div style="background:#e2e8f0;border-radius:50%;padding:3px;flex-shrink:0;"><img src="Images/robo.png" alt="Logo" style="height:36px;width:auto;"></div>
+      <div>
+        <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:0.95rem;color:#fff;line-height:1.2;margin:0;">Robotics Club</p>
+        <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:0.95rem;line-height:1.2;color:#3b82f6;margin:0;">Nitte</p>
+      </div>
+    </a>
+    <button onclick="closeSidebar()" style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;cursor:pointer;color:rgba(200,195,232,0.5);display:flex;align-items:center;justify-content:center;" aria-label="Close">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div style="padding:16px 12px;flex:1;">
+    <p style="font-size:0.58rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(200,195,232,0.3);padding:0 8px;margin:0 0 8px;">Navigation</p>
+    <a href="index.html#about"     class="side-link" onclick="closeSidebar()"><span class="side-icon"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>About Us</a>
+    <a href="index.html#divisions" class="side-link" onclick="closeSidebar()"><span class="side-icon"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></span>Divisions</a>
+    <a href="achievements.html"    class="side-link"><span class="side-icon"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg></span>Achievements</a>
+    <a href="leaderboard.html"     class="side-link" style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.2);color:#f97316;"><span class="side-icon" style="background:rgba(249,115,22,0.15);border-color:rgba(249,115,22,0.3);color:#f97316;"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></span>Bot Leaderboard</a>
+    <a href="index.html#contact"   class="side-link" onclick="closeSidebar()"><span class="side-icon"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>Contact Us</a>
+    <div style="height:1px;background:linear-gradient(90deg,rgba(59,130,246,0.2),rgba(124,58,237,0.1),transparent);margin:14px 8px;"></div>
+    <p style="font-size:0.58rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(200,195,232,0.3);padding:0 8px;margin:0 0 8px;">Members</p>
+    <a href="member-login.html" class="side-link" style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);color:#60a5fa;"><span class="side-icon" style="background:rgba(59,130,246,0.12);border-color:rgba(59,130,246,0.3);color:#3b82f6;"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></span>Member Login</a>
+    <div style="height:1px;background:linear-gradient(90deg,rgba(249,115,22,0.25),rgba(124,58,237,0.15),transparent);margin:14px 8px;"></div>
+    <p style="font-size:0.58rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(200,195,232,0.3);padding:0 8px;margin:0 0 8px;">Resources</p>
+    <a href="electronics-handbook.pdf" target="_blank" rel="noopener" class="side-link side-link-resource"><span class="side-icon side-icon-resource"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></span>Electronics Handbook<span style="margin-left:auto;font-size:0.58rem;font-weight:700;text-transform:uppercase;color:rgba(249,115,22,0.7);background:rgba(249,115,22,0.1);padding:2px 6px;border-radius:4px;">PDF</span></a>
+    <a href="rules.html" class="side-link side-link-resource"><span class="side-icon side-icon-resource"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></span>Club Rule Book</a>
+  </div>
+  <div style="padding:14px 24px;border-top:1px solid rgba(255,255,255,0.07);">
+    <p style="font-size:0.7rem;color:rgba(200,195,232,0.3);margin:0;">NMAM Institute of Technology, Nitte</p>
+  </div>
+</nav>
+
+<style>
+  body { padding-top: 64px; }
+  .side-link { display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;text-decoration:none;font-size:0.88rem;font-weight:500;color:rgba(200,195,232,0.8);transition:background 0.2s,color 0.2s;margin-bottom:2px; }
+  .side-link:hover { background:rgba(249,115,22,0.08);color:#fff; }
+  .side-link-resource { color:rgba(200,195,232,0.6); }
+  .side-link-resource:hover { background:rgba(249,115,22,0.08);color:#fbbf24; }
+  .side-icon { width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:rgba(200,195,232,0.55);transition:background 0.2s,color 0.2s; }
+  .side-link:hover .side-icon { background:rgba(249,115,22,0.15);color:#f97316;border-color:rgba(249,115,22,0.3); }
+  .side-icon-resource { background:rgba(249,115,22,0.06);border-color:rgba(249,115,22,0.18);color:rgba(249,115,22,0.6); }
+</style>
+<script>
+  const sidebar  = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const toggle   = document.getElementById('sidebar-toggle');
+  const iOpen    = document.getElementById('icon-open');
+  const iClose   = document.getElementById('icon-close');
+  function openSidebar()  { sidebar.style.transform='translateX(0)';backdrop.style.opacity='1';backdrop.style.pointerEvents='auto';iOpen.style.display='none';iClose.style.display='block'; }
+  function closeSidebar() { sidebar.style.transform='translateX(-100%)';backdrop.style.opacity='0';backdrop.style.pointerEvents='none';iOpen.style.display='block';iClose.style.display='none'; }
+  toggle.addEventListener('click', () => sidebar.style.transform==='translateX(0px)' ? closeSidebar() : openSidebar());
+  backdrop.addEventListener('click', closeSidebar);
+</script>
+
+<!-- ══════════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════════ -->
+<main style="max-width:1200px;margin:0 auto;padding:48px 20px 80px;">
+
+  <!-- Page header -->
+  <div style="text-align:center;margin-bottom:48px;">
+    <p class="section-eyebrow">Hall of Champions</p>
+    <h1 style="font-family:'Inter',sans-serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:800;color:#fff;margin:10px 0 14px;line-height:1.1;">Bot Leaderboard</h1>
+    <p style="font-size:1rem;color:rgba(200,195,232,0.6);max-width:520px;margin:0 auto;line-height:1.7;">Every bot that's flown our colours on the competition floor — their builds, their battles, their wins.</p>
+  </div>
+
+  <!-- Admin notice -->
+  <div class="placeholder-notice">
+    <svg width="20" height="20" fill="none" stroke="#f97316" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <p><strong>Admin note:</strong> Bot details, photos and winning records below are placeholder templates. Replace each card's content and swap <code style="background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px;font-size:0.82rem;">Bots_lead/bot-name.jpg</code> image paths once the actual data is provided. Rankings are ordered by total gold medals.</p>
+  </div>
+
+  <!-- ── Filter bar ── -->
+  <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:36px;" id="filter-bar">
+    <button class="filter-btn active" data-filter="all"    onclick="filterBots('all',this)">All Bots</button>
+    <button class="filter-btn"        data-filter="combat" onclick="filterBots('combat',this)">Combat</button>
+    <button class="filter-btn"        data-filter="soft"   onclick="filterBots('soft',this)">Soft Robotics</button>
+  </div>
+
+  <!-- ── Top 3 Podium ── -->
+  <div style="display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:16px;max-width:800px;margin:0 auto 48px;align-items:end;">
+
+    <!-- 2nd -->
+    <div style="text-align:center;">
+      <div style="background:#110e1f;border:1px solid rgba(148,163,184,0.2);border-radius:16px;padding:20px 16px;position:relative;">
+        <div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#94a3b8,#64748b);display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-weight:800;font-size:0.85rem;color:#fff;box-shadow:0 0 12px rgba(148,163,184,0.3);">2</div>
+        <div style="width:72px;height:72px;border-radius:50%;background:#1a1630;margin:12px auto 12px;border:2px solid rgba(148,163,184,0.3);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+          <img src="Bots_lead/bot-2.jpg" alt="Bot 2" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=32 height=32 fill=none stroke=currentColor viewBox=&quot;0 0 24 24&quot; style=&quot;color:rgba(200,195,232,0.2);&quot;><path stroke-linecap=round stroke-linejoin=round stroke-width=1.5 d=&quot;M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z&quot;/></svg>'">
+        </div>
+        <p style="font-family:'Inter',sans-serif;font-weight:700;font-size:0.9rem;color:#fff;margin:0 0 4px;">Bot Name 2</p>
+        <p style="font-size:0.7rem;color:rgba(200,195,232,0.4);margin:0 0 10px;">Combat</p>
+        <div style="display:flex;justify-content:center;gap:4px;flex-wrap:wrap;">
+          <span class="stat-gold">🥇 2</span><span class="stat-silver">🥈 3</span>
+        </div>
+      </div>
+      <div style="height:40px;background:linear-gradient(to bottom,rgba(148,163,184,0.15),transparent);border-radius:0 0 8px 8px;"></div>
+    </div>
+
+    <!-- 1st -->
+    <div style="text-align:center;">
+      <div style="background:#110e1f;border:1px solid rgba(251,191,36,0.3);border-radius:16px;padding:24px 16px;position:relative;box-shadow:0 0 32px rgba(251,191,36,0.1);">
+        <div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:1.5rem;">👑</div>
+        <div style="position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-weight:800;font-size:0.9rem;color:#000;box-shadow:0 0 20px rgba(251,191,36,0.5);margin-top:18px;">1</div>
+        <div style="width:84px;height:84px;border-radius:50%;background:#1a1630;margin:32px auto 14px;border:2px solid rgba(251,191,36,0.5);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+          <img src="Bots_lead/bot-1.jpg" alt="Bot 1" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=36 height=36 fill=none stroke=currentColor viewBox=&quot;0 0 24 24&quot; style=&quot;color:rgba(200,195,232,0.2);&quot;><path stroke-linecap=round stroke-linejoin=round stroke-width=1.5 d=&quot;M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z&quot;/></svg>'">
+        </div>
+        <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:1rem;color:#fff;margin:0 0 4px;">Bot Name 1</p>
+        <p style="font-size:0.7rem;color:rgba(200,195,232,0.4);margin:0 0 12px;">Combat</p>
+        <div style="display:flex;justify-content:center;gap:4px;flex-wrap:wrap;">
+          <span class="stat-gold">🥇 5</span><span class="stat-silver">🥈 2</span><span class="stat-bronze">🥉 1</span>
+        </div>
+      </div>
+      <div style="height:60px;background:linear-gradient(to bottom,rgba(251,191,36,0.12),transparent);border-radius:0 0 8px 8px;"></div>
+    </div>
+
+    <!-- 3rd -->
+    <div style="text-align:center;">
+      <div style="background:#110e1f;border:1px solid rgba(234,88,12,0.2);border-radius:16px;padding:20px 16px;position:relative;">
+        <div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#fb923c,#ea580c);display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-weight:800;font-size:0.85rem;color:#fff;box-shadow:0 0 12px rgba(249,115,22,0.35);">3</div>
+        <div style="width:72px;height:72px;border-radius:50%;background:#1a1630;margin:12px auto 12px;border:2px solid rgba(234,88,12,0.3);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+          <img src="Bots_lead/bot-3.jpg" alt="Bot 3" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=32 height=32 fill=none stroke=currentColor viewBox=&quot;0 0 24 24&quot; style=&quot;color:rgba(200,195,232,0.2);&quot;><path stroke-linecap=round stroke-linejoin=round stroke-width=1.5 d=&quot;M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z&quot;/></svg>'">
+        </div>
+        <p style="font-family:'Inter',sans-serif;font-weight:700;font-size:0.9rem;color:#fff;margin:0 0 4px;">Bot Name 3</p>
+        <p style="font-size:0.7rem;color:rgba(200,195,232,0.4);margin:0 0 10px;">Soft Robotics</p>
+        <div style="display:flex;justify-content:center;gap:4px;flex-wrap:wrap;">
+          <span class="stat-gold">🥇 2</span><span class="stat-bronze">🥉 2</span>
+        </div>
+      </div>
+      <div style="height:20px;background:linear-gradient(to bottom,rgba(234,88,12,0.1),transparent);border-radius:0 0 8px 8px;"></div>
+    </div>
+
+  </div><!-- /podium -->
+
+  <div class="iris-divider" style="margin-bottom:40px;"></div>
+
+  <!-- ── Full bot grid ── -->
+  <div id="bot-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;">
+
+    <!-- BOT 1 -->
+    <div class="bot-card fade-in-section" data-division="combat">
+      <div style="position:relative;">
+        <div class="bot-photo-placeholder">
+          <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>Bot photo coming soon</span>
+        </div>
+        <div class="rank-badge rank-1">#1</div>
+      </div>
+      <div class="bot-body">
+        <div>
+          <h2 class="bot-name">Bot Name 1</h2>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
+            <span class="bot-division">⚔️ Combat</span>
+            <span style="font-size:0.7rem;color:rgba(200,195,232,0.35);">Est. 20XX</span>
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:rgba(200,195,232,0.6);line-height:1.6;margin:0;">Bot description goes here — category, weight class, special build features, and what makes it unique on the competition floor.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="stat-gold">🥇 5 Gold</span>
+          <span class="stat-silver">🥈 2 Silver</span>
+          <span class="stat-bronze">🥉 1 Bronze</span>
+        </div>
+        <div>
+          <p style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(200,195,232,0.35);margin:0 0 8px;">Competition Record</p>
+          <ul class="win-list">
+            <li class="win-item"><span class="win-medal">🥇</span><div class="win-text"><strong>Event Name · Year</strong><span>Category · Venue</span></div></li>
+            <li class="win-item"><span class="win-medal">🥇</span><div class="win-text"><strong>Event Name · Year</strong><span>Category · Venue</span></div></li>
+            <li class="win-item"><span class="win-medal">🥈</span><div class="win-text"><strong>Event Name · Year</strong><span>Category · Venue</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOT 2 -->
+    <div class="bot-card fade-in-section" data-division="combat">
+      <div style="position:relative;">
+        <div class="bot-photo-placeholder">
+          <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>Bot photo coming soon</span>
+        </div>
+        <div class="rank-badge rank-2">#2</div>
+      </div>
+      <div class="bot-body">
+        <div>
+          <h2 class="bot-name">Bot Name 2</h2>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
+            <span class="bot-division">⚔️ Combat</span>
+            <span style="font-size:0.7rem;color:rgba(200,195,232,0.35);">Est. 20XX</span>
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:rgba(200,195,232,0.6);line-height:1.6;margin:0;">Bot description goes here — category, weight class, special build features, and what makes it unique on the competition floor.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="stat-gold">🥇 2 Gold</span>
+          <span class="stat-silver">🥈 3 Silver</span>
+        </div>
+        <div>
+          <p style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(200,195,232,0.35);margin:0 0 8px;">Competition Record</p>
+          <ul class="win-list">
+            <li class="win-item"><span class="win-medal">🥇</span><div class="win-text"><strong>Event Name · Year</strong><span>Category · Venue</span></div></li>
+            <li class="win-item"><span class="win-medal">🥈</span><div class="win-text"><strong>Event Name · Year</strong><span>Category · Venue</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOT 3 -->
+    <div class="bot-card fade-in-section" data-division="soft">
+      <div style="position:relative;">
+        <div class="bot-photo-placeholder">
+          <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>Bot photo coming soon</span>
+        </div>
+        <div class="rank-badge rank-3">#3</div>
+      </div>
+      <div class="bot-body">
+        <div>
+          <h2 class="bot-name">Bot Name 3</h2>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
+            <span class="bot-division">🤖 Soft Robotics</span>
+            <span style="font-size:0.7rem;color:rgba(200,195,232,0.35);">Est. 20XX</span>
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:rgba(200,195,232,0.6);line-height:1.6;margin:0;">Bot description goes here — category, special sensors, algorithm used, and what makes it a standout on the line-following track.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="stat-gold">🥇 2 Gold</span>
+          <span class="stat-bronze">🥉 2 Bronze</span>
+        </div>
+        <div>
+          <p style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(200,195,232,0.35);margin:0 0 8px;">Competition Record</p>
+          <ul class="win-list">
+            <li class="win-item"><span class="win-medal">🥇</span><div class="win-text"><strong>Event Name · Year</strong><span>Category · Venue</span></div></li>
+            <li class="win-item"><span class="win-medal">🥉</span><div class="win-text"><strong>Event Name · Year</strong><span>Category · Venue</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOT 4 -->
+    <div class="bot-card fade-in-section" data-division="soft">
+      <div style="position:relative;">
+        <div class="bot-photo-placeholder">
+          <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>Bot photo coming soon</span>
+        </div>
+        <div class="rank-badge rank-n">#4</div>
+      </div>
+      <div class="bot-body">
+        <div>
+          <h2 class="bot-name">Bot Name 4</h2>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
+            <span class="bot-division">🤖 Soft Robotics</span>
+            <span style="font-size:0.7rem;color:rgba(200,195,232,0.35);">Est. 20XX</span>
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:rgba(200,195,232,0.6);line-height:1.6;margin:0;">Bot description goes here — category, maze-solving algorithm, sensor setup, and design highlights.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="stat-gold">🥇 1 Gold</span>
+          <span class="stat-silver">🥈 1 Silver</span>
+        </div>
+        <div>
+          <p style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(200,195,232,0.35);margin:0 0 8px;">Competition Record</p>
+          <ul class="win-list">
+            <li class="win-item"><span class="win-medal">🥇</span><div class="win-text"><strong>Event Name · Year</strong><span>Category · Venue</span></div></li>
+            <li class="win-item"><span class="win-medal">🥈</span><div class="win-text"><strong>Event Name · Year</strong><span>Category · Venue</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOT 5 -->
+    <div class="bot-card fade-in-section" data-division="combat">
+      <div style="position:relative;">
+        <div class="bot-photo-placeholder">
+          <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>Bot photo coming soon</span>
+        </div>
+        <div class="rank-badge rank-n">#5</div>
+      </div>
+      <div class="bot-body">
+        <div>
+          <h2 class="bot-name">Bot Name 6</h2>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
+            <span class="bot-division">⚔️ Combat</span>
+            <span style="font-size:0.7rem;color:rgba(200,195,232,0.35);">Est. 20XX</span>
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:rgba(200,195,232,0.6);line-height:1.6;margin:0;">Bot description goes here — category, weight class, special build features, and what makes it unique on the competition floor.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="stat-silver">🥈 1 Silver</span>
+          <span class="stat-bronze">🥉 2 Bronze</span>
+        </div>
+        <div>
+          <p style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(200,195,232,0.35);margin:0 0 8px;">Competition Record</p>
+          <ul class="win-list">
+            <li class="win-item"><span class="win-medal">🥈</span><div class="win-text"><strong>Event Name · Year</strong><span>Category · Venue</span></div></li>
+            <li class="win-item"><span class="win-medal">🥉</span><div class="win-text"><strong>Event Name · Year</strong><span>Category · Venue</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /bot-grid -->
+
+  <!-- Back home -->
+  <div style="text-align:center;margin-top:56px;">
+    <a href="index.html" class="btn-iris" style="text-decoration:none;display:inline-block;padding:11px 28px;border-radius:99px;font-family:'Inter',sans-serif;font-weight:700;font-size:0.88rem;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;box-shadow:0 4px 18px rgba(249,115,22,0.35);transition:opacity 0.2s;" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">← Back to Home</a>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer style="background:#080612;border-top:1px solid rgba(255,255,255,0.06);padding:32px 24px;text-align:center;margin-top:20px;">
+  <div class="iris-divider" style="margin-bottom:20px;"></div>
+  <p style="font-family:'Inter',sans-serif;font-weight:700;font-size:0.95rem;color:#3b82f6;margin:0;">Robotics Club Nitte</p>
+  <p style="font-size:0.78rem;color:rgba(200,195,232,0.3);margin:6px 0 0;">NMAM Institute of Technology, Nitte &nbsp;·&nbsp; Est. 2014</p>
+  <p style="font-size:0.72rem;color:rgba(200,195,232,0.2);margin:4px 0 0;">&copy; 2025 Robotics Club Nitte. All Rights Reserved.</p>
+</footer>
+
+<script>
+  // Scroll fade-in
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e,i) => {
+      if (e.isIntersecting) setTimeout(() => e.target.classList.add('is-visible'), i * 80);
+    });
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.fade-in-section').forEach(el => obs.observe(el));
+
+  // Filter
+  function filterBots(division, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#bot-grid .bot-card').forEach(card => {
+      const match = division === 'all' || card.dataset.division === division;
+      card.style.display = match ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>

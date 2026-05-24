@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Dashboard · Robotics Club Nitte</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0812;--surface:#0e0b1a;--border:rgba(255,255,255,.07);--text:#c8c3e8;--dim:rgba(200,195,232,.45);--orange:#f97316;--blue:#3b82f6;--cyan:#06b6d4;--purple:#7c3aed;--green:#10b981;--red:#ef4444}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 15% 5%,rgba(59,130,246,.08) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 85% 85%,rgba(124,58,237,.07) 0%,transparent 60%);pointer-events:none;z-index:0}
+
+    #topbar{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;background:rgba(10,8,18,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+    .brand{font-family:'Inter',sans-serif;font-weight:800;font-size:.9rem;color:#fff;text-decoration:none;position:absolute;left:50%;transform:translateX(-50%)}.brand span{color:var(--blue)}
+    .topbar-right{display:flex;align-items:center;gap:10px}
+    .user-pill{display:flex;align-items:center;gap:8px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);border-radius:20px;padding:5px 13px 5px 7px;font-size:.8rem;font-weight:600;color:#60a5fa}
+    .u-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff}
+    .logout-btn{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:9px;padding:7px 13px;cursor:pointer;font-size:.78rem;font-weight:600;color:#fca5a5;font-family:'Inter',sans-serif;transition:background .2s}.logout-btn:hover{background:rgba(239,68,68,.2)}
+
+    .page{padding-top:80px;max-width:1100px;margin:0 auto;padding-bottom:60px;position:relative;z-index:1}
+    .inner{padding:0 20px}
+
+    .greeting{margin:28px 0 24px}
+    .greeting .tbadge{display:inline-block;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);border-radius:20px;padding:4px 12px;font-size:.68rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--cyan);margin-bottom:9px}
+    .greeting h1{font-family:'Space Grotesk',sans-serif;font-size:1.75rem;font-weight:700;color:#fff;letter-spacing:-.02em}
+    .greeting p{font-size:.85rem;color:var(--dim);margin-top:3px}
+
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px}
+    .sc{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+    .sc .lbl{font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:7px}
+    .sc .val{font-family:'Space Grotesk',sans-serif;font-size:1.55rem;font-weight:700;color:#fff}
+    .sc .sub{font-size:.72rem;color:var(--dim);margin-top:2px}
+
+    .rulebook-card{background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(124,58,237,.08));border:1px solid rgba(59,130,246,.2);border-radius:16px;padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .rulebook-info h3{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:3px}
+    .rulebook-info p{font-size:.8rem;color:var(--dim)}
+    .btn-rule{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--blue),var(--purple));border:none;border-radius:10px;padding:9px 18px;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:700;color:#fff;text-decoration:none;cursor:pointer;transition:opacity .2s,transform .15s;white-space:nowrap}.btn-rule:hover{opacity:.9;transform:translateY(-1px)}
+
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+    @media(max-width:680px){.grid-2{grid-template-columns:1fr}}
+
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+    .card-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+    .card-hdr h2{font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:7px}
+    .card-body{padding:18px}
+
+    /* CALENDAR */
+    .cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .cal-hdr h3{font-size:.9rem;font-weight:700;color:#fff}
+    .cal-nav{display:flex;gap:5px}
+    .cal-nav button{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;width:28px;height:28px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;transition:background .2s}.cal-nav button:hover{background:rgba(255,255,255,.1)}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+    .cd-lbl{font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--dim);padding:5px 0}
+    .cd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:.75rem;border-radius:7px;cursor:default;transition:background .15s}
+    .cd.other{color:rgba(200,195,232,.2)}.cd.today{background:var(--blue);color:#fff;font-weight:700}
+    .cd.has-event{background:rgba(249,115,22,.14);color:var(--orange);font-weight:600;border:1px solid rgba(249,115,22,.28);cursor:pointer}.cd.has-event:hover{background:rgba(249,115,22,.24)}
+
+    /* EVENTS */
+    .ev-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}.ev-item:last-child{border-bottom:none;padding-bottom:0}
+    .ev-date{flex-shrink:0;width:44px;text-align:center;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);border-radius:9px;padding:5px 3px}
+    .ev-date .month{font-size:.57rem;font-weight:700;text-transform:uppercase;color:#60a5fa}
+    .ev-date .day{font-size:1.05rem;font-weight:700;color:#fff;line-height:1.2}
+    .ev-info h4{font-size:.84rem;font-weight:600;color:#fff;margin-bottom:2px}
+    .ev-info p{font-size:.73rem;color:var(--dim)}
+    .etag{display:inline-block;padding:2px 7px;border-radius:20px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
+    .t-comp{background:rgba(249,115,22,.14);color:var(--orange);border:1px solid rgba(249,115,22,.2)}
+    .t-work{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2)}
+    .t-meet{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2)}
+    .t-dead{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.2)}
+    .t-other{background:rgba(124,58,237,.12);color:#a78bfa;border:1px solid rgba(124,58,237,.2)}
+
+    /* PROFILE */
+    .prof-top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+    .prof-av{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0}
+    .prof-name{font-size:.96rem;font-weight:700;color:#fff}
+    .prof-meta{font-size:.75rem;color:var(--dim);margin-top:1px}
+    .prof-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.8rem}
+    .prof-row:last-child{border-bottom:none}
+    .prof-row .key{color:var(--dim)}.prof-row .val{color:#fff;font-weight:500;text-align:right;max-width:60%;word-break:break-all}
+    .sbadge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.66rem;font-weight:700;text-transform:uppercase}
+    .s-active{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+
+    /* QUICK LINKS */
+    .ql-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+    .ql{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:11px;padding:10px 12px;text-decoration:none;color:var(--text);transition:background .2s,border-color .2s}
+    .ql:hover{background:rgba(255,255,255,.06);border-color:rgba(59,130,246,.3)}
+    .ql .qi{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .ql span{font-size:.79rem;font-weight:600}
+  </style>
+</head>
+<body>
+
+<div id="topbar">
+  <a href="../index.html" style="width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(249,115,22,.12);display:flex;align-items:center;justify-content:center;color:#f97316;text-decoration:none;transition:background .2s;" onmouseover="this.style.background='rgba(249,115,22,.25)'" onmouseout="this.style.background='rgba(249,115,22,.12)'" aria-label="Go back">
+    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 19l-7-7 7-7"/></svg>
+  </a>
+  <a href="../index.html" class="brand">Robotics Club <span>Nitte</span></a>
+  <div class="topbar-right">
+    <div class="user-pill">
+      <div class="u-avatar" id="av-init">?</div>
+      <span id="u-name-top">Member</span>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sign Out</button>
+  </div>
+</div>
+
+<div class="page"><div class="inner">
+
+  <div class="greeting">
+    <div class="tbadge" id="time-badge">Good morning</div>
+    <h1>Welcome back, <span id="greet-name" style="color:var(--blue)">Member</span> 👋</h1>
+    <p id="greet-sub">Here's what's happening at Robotics Club Nitte</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="sc"><div class="lbl">Member Since</div><div class="val" id="s-since">—</div><div class="sub">Join date</div></div>
+    <div class="sc"><div class="lbl">Total Logins</div><div class="val" id="s-logins">—</div><div class="sub">Sessions</div></div>
+    <div class="sc"><div class="lbl">Upcoming Events</div><div class="val">4</div><div class="sub">This month</div></div>
+    <div class="sc"><div class="lbl">Status</div><div class="val" style="font-size:.9rem;margin-top:4px"><span class="sbadge s-active">Active</span></div><div class="sub">Account active</div></div>
+  </div>
+
+  <div class="rulebook-card">
+    <div style="flex-shrink:0"><svg width="46" height="46" fill="none" stroke="rgba(59,130,246,.45)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div>
+    <div class="rulebook-info">
+      <h3>📖 Club Rulebook</h3>
+      <p>Club constitution, competition rules, code of conduct — exclusively for members.</p>
+    </div>
+    <a href="../rules.html" class="btn-rule">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      View Rulebook
+    </a>
+  </div>
+
+  <div class="grid-2">
+    <!-- CALENDAR -->
+    <div class="card">
+      <div class="card-hdr">
+        <h2><svg width="17" height="17" fill="none" stroke="var(--cyan)" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 2v4M8 2v4M3 10h18"/></svg>Events Calendar</h2>
+      </div>
+      <div class="card-body">
+        <div class="cal-hdr">
+          <h3 id="cal-title"></h3>
+          <div class="cal-nav">
+            <button onclick="changeMonth(-1)"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <button onclick="changeMonth(1)"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+    </div>
+
+    <!-- UPCOMING EVENTS -->
+    <div class="card">
+      <div class="card-hdr"><h2><svg width="17" height="17" fill="none" stroke="var(--orange)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Upcoming Events</h2></div>
+      <div class="card-body" style="padding-top:6px" id="ev-list">
+        <!-- Events loaded dynamically from localStorage (managed in Admin Dashboard) -->
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- PROFILE -->
+    <div class="card">
+      <div class="card-hdr"><h2><svg width="17" height="17" fill="none" stroke="var(--purple)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>My Profile</h2></div>
+      <div class="card-body">
+        <div class="prof-top">
+          <div class="prof-av" id="prof-av">?</div>
+          <div><div class="prof-name" id="prof-name">—</div><div class="prof-meta" id="prof-meta">—</div></div>
+        </div>
+        <div class="prof-row"><span class="key">Username</span><span class="val" id="p-username">—</span></div>
+        <div class="prof-row"><span class="key">Email</span><span class="val" id="p-email">—</span></div>
+        <div class="prof-row"><span class="key">USN</span><span class="val" id="p-usn">—</span></div>
+        <div class="prof-row"><span class="key">Phone</span><span class="val" id="p-phone">—</span></div>
+        <div class="prof-row"><span class="key">Department</span><span class="val" id="p-dept">—</span></div>
+        <div class="prof-row"><span class="key">Last Login</span><span class="val" id="p-last">—</span></div>
+        <div class="prof-row"><span class="key">Status</span><span class="val"><span class="sbadge s-active">Active</span></span></div>
+      </div>
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="card">
+      <div class="card-hdr"><h2><svg width="17" height="17" fill="none" stroke="var(--green)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>Quick Links</h2></div>
+      <div class="card-body">
+        <div class="ql-grid">
+          <a href="../achievements.html" class="ql"><div class="qi" style="background:rgba(249,115,22,.12)"><svg width="17" height="17" fill="none" stroke="#f97316" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg></div><span>Achievements</span></a>
+          <a href="../leaderboard.html" class="ql"><div class="qi" style="background:rgba(59,130,246,.12)"><svg width="17" height="17" fill="none" stroke="#3b82f6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div><span>Leaderboard</span></a>
+          <a href="../rules.html" class="ql"><div class="qi" style="background:rgba(124,58,237,.12)"><svg width="17" height="17" fill="none" stroke="#7c3aed" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div><span>Rulebook</span></a>
+          <a href="../index.html#contact" class="ql"><div class="qi" style="background:rgba(6,182,212,.12)"><svg width="17" height="17" fill="none" stroke="#06b6d4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><span>Contact</span></a>
+          <a href="../index.html#divisions" class="ql"><div class="qi" style="background:rgba(16,185,129,.12)"><svg width="17" height="17" fill="none" stroke="#10b981" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div><span>Divisions</span></a>
+          <a href="../index.html#about" class="ql"><div class="qi" style="background:rgba(239,68,68,.1)"><svg width="17" height="17" fill="none" stroke="#ef4444" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><span>About Club</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<!-- Shared core: hashing, data helpers, default seeds, UI utils -->
+<script src="rcn-core.js"></script>
+
+<script>
+// ── PAGE-SPECIFIC LOGIC : member-dashboard.html ───────────────
+
+// Auth guard — redirect to login if no valid persistent session
+let member;
+(function() {
+  const raw = localStorage.getItem('rcn_member_session');
+  if (!raw) { window.location.href = 'member-login.html'; return; }
+  try {
+    const s = JSON.parse(raw);
+    if (!s.expiresAt || Date.now() >= s.expiresAt) {
+      localStorage.removeItem('rcn_member_session');
+      window.location.href = 'member-login.html';
+      return;
+    }
+    // Refresh expiry on each visit (sliding window — resets to 7 days from now)
+    s.expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
+    localStorage.setItem('rcn_member_session', JSON.stringify(s));
+    member = s.member;
+  } catch(e) {
+    localStorage.removeItem('rcn_member_session');
+    window.location.href = 'member-login.html';
+  }
+})();
+
+// Populate topbar & profile using initials() from rcn-core.js
+document.getElementById('av-init').textContent    = initials(member.name);
+document.getElementById('u-name-top').textContent = (member.name || 'Member').split(' ')[0];
+document.getElementById('greet-name').textContent = (member.name || 'Member').split(' ')[0];
+document.getElementById('prof-av').textContent    = initials(member.name);
+document.getElementById('prof-name').textContent  = member.name     || '—';
+document.getElementById('prof-meta').textContent  = '@' + (member.username || '—');
+document.getElementById('p-username').textContent = '@' + (member.username || '—');
+document.getElementById('p-email').textContent    = member.email    || '—';
+document.getElementById('p-usn').textContent      = member.usn      || '—';
+document.getElementById('p-phone').textContent    = member.phone    || '—';
+document.getElementById('p-dept').textContent     = member.dept     || '—';
+document.getElementById('s-logins').textContent   = member.loginCount || 1;
+
+// Dates — using fmtDate / fmtDateTime from rcn-core.js
+const jd = member.joinDate  ? new Date(member.joinDate)  : null;
+const ll = member.lastLogin ? new Date(member.lastLogin) : null;
+document.getElementById('s-since').textContent = jd ? jd.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '—';
+document.getElementById('p-last').textContent  = ll ? fmtDateTime(member.lastLogin) : 'First login';
+
+// Time-of-day greeting
+const h = new Date().getHours();
+document.getElementById('time-badge').textContent = h < 12 ? '☀️ Good Morning' : h < 17 ? '🌤 Good Afternoon' : '🌙 Good Evening';
+
+// ── CALENDAR & EVENTS (dynamic — data written by admin) ───────
+let cy, cm;
+const today  = new Date();
+cy = today.getFullYear(); cm = today.getMonth();
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const EV_MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DAYS   = ['S','M','T','W','T','F','S'];
+
+function getEvents() { return JSON.parse(localStorage.getItem('rcn_events') || '[]'); }
+
+// Build {YYYY-M-D: [event,...]} map from stored events
+function buildEventMap() {
+  const map = {};
+  getEvents().forEach(ev => {
+    const d = new Date(ev.date + 'T00:00:00');
+    const key = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+    if (!map[key]) map[key] = [];
+    map[key].push(ev);
+  });
+  return map;
+}
+
+function renderCal() {
+  const eventMap = buildEventMap();
+  const g = document.getElementById('cal-grid');
+  document.getElementById('cal-title').textContent = MONTHS[cm] + ' ' + cy;
+  g.innerHTML = DAYS.map(d => `<div class="cd-lbl">${d}</div>`).join('');
+  const first = new Date(cy, cm, 1).getDay();
+  const dim   = new Date(cy, cm + 1, 0).getDate();
+  const prev  = new Date(cy, cm, 0).getDate();
+  for (let i = 0; i < first; i++)
+    g.innerHTML += `<div class="cd other">${prev - first + 1 + i}</div>`;
+  for (let d = 1; d <= dim; d++) {
+    const key  = `${cy}-${cm + 1}-${d}`;
+    const isT  = d === today.getDate() && cm === today.getMonth() && cy === today.getFullYear();
+    const evs  = eventMap[key];
+    const cls  = 'cd' + (isT ? ' today' : evs ? ' has-event' : '');
+    const tip  = evs ? evs.map(e=>e.title).join(', ') : '';
+    g.innerHTML += `<div class="${cls}"${tip ? ` title="${tip}"` : ''}>${d}</div>`;
+  }
+  const rem = 42 - first - dim;
+  for (let i = 1; i <= rem; i++) g.innerHTML += `<div class="cd other">${i}</div>`;
+}
+function changeMonth(d) { cm += d; if (cm > 11) { cm = 0; cy++; } if (cm < 0) { cm = 11; cy--; } renderCal(); }
+renderCal();
+
+// Render upcoming events list dynamically
+function renderUpcomingEvents() {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const events = getEvents()
+    .filter(ev => new Date(ev.date + 'T00:00:00') >= now)
+    .sort((a,b) => new Date(a.date) - new Date(b.date))
+    .slice(0, 5);
+  const container = document.getElementById('ev-list');
+  if (!container) return;
+  const TAG_CLASS = { competition:'t-comp', workshop:'t-work', meeting:'t-meet', deadline:'t-dead', other:'t-other' };
+  const TAG_LABEL = { competition:'Competition', workshop:'Workshop', meeting:'Meeting', deadline:'Deadline', other:'Other' };
+  if (!events.length) {
+    container.innerHTML = '<p style="color:var(--dim);font-size:.82rem;padding:8px 0;text-align:center">No upcoming events scheduled.</p>';
+    return;
+  }
+  container.innerHTML = events.map(ev => {
+    const d = new Date(ev.date + 'T00:00:00');
+    const tc = TAG_CLASS[ev.type] || 't-other';
+    const tl = TAG_LABEL[ev.type] || 'Event';
+    const loc = ev.location ? ` · ${ev.location}` : '';
+    const time = ev.time ? ` · ${ev.time}` : '';
+    return `<div class="ev-item">
+      <div class="ev-date"><div class="month">${EV_MONTHS_SHORT[d.getMonth()]}</div><div class="day">${d.getDate()}</div></div>
+      <div class="ev-info">
+        <h4>${ev.title}</h4>
+        <p>${ev.desc || ''}${loc}${time}</p>
+        <span class="etag ${tc}">${tl}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Update stat card
+  const statEl = document.querySelector('.sc .val');
+  // find the "Upcoming Events" stat card specifically
+  document.querySelectorAll('.sc').forEach(sc => {
+    if (sc.querySelector('.lbl') && sc.querySelector('.lbl').textContent === 'Upcoming Events') {
+      sc.querySelector('.val').textContent = events.length;
+    }
+  });
+}
+renderUpcomingEvents();
+
+// ── LOGOUT ────────────────────────────────────────────────────
+function logout() { localStorage.removeItem('rcn_member_session'); window.location.href = 'member-login.html'; }
+</script>
+</body>
+</html>

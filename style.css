@@ -1,0 +1,274 @@
+/* ============================================================
+   Robotics Club Nitte — Iridescent Theme
+   Inspired by: fluid 3D forms, holographic surfaces, deep space
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+:root {
+  /* Core palette */
+  --void:        #0a0812;
+  --deep:        #110e1f;
+  --surface:     #1a1630;
+  --border:      rgba(255,255,255,0.08);
+
+  /* Iridescent accent spectrum */
+  --iris-1:      #ff3cac;
+  --iris-2:      #f97316;
+  --iris-3:      #fbbf24;
+  --iris-4:      #7c3aed;
+  --iris-5:      #06b6d4;
+
+  /* Brand blue — used for the club name everywhere */
+  --brand-blue:        #3b82f6;
+  --brand-blue-light:  #60a5fa;
+
+  /* Semantic aliases */
+  --color-accent:   #f97316;
+  --color-skyblue:  #38bdf8;
+
+  /* Typography — formal & clean */
+  --font-display: 'Inter', sans-serif;
+  --font-body:    'Source Sans 3', 'Inter', sans-serif;
+}
+
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--void);
+  color: #c8c3e8;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--void); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--iris-1), var(--iris-2));
+  border-radius: 99px;
+}
+
+/* ── Noise / grain overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* ── Ambient orbs (painted on sections via pseudo) ── */
+.orb-bg {
+  position: relative;
+  overflow: hidden;
+}
+.orb-bg::after {
+  content: '';
+  position: absolute;
+  width: 700px; height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(124,58,237,0.18) 0%, transparent 70%);
+  top: -200px; right: -200px;
+  pointer-events: none;
+}
+.orb-bg::before {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(249,115,22,0.12) 0%, transparent 70%);
+  bottom: -100px; left: -150px;
+  pointer-events: none;
+}
+
+/* ── Iridescent gradient text ── */
+.grad-text {
+  background: linear-gradient(135deg, var(--iris-3) 0%, var(--iris-1) 40%, var(--iris-4) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.grad-text-cyan {
+  background: linear-gradient(135deg, var(--iris-5) 0%, var(--iris-4) 60%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Holographic card ── */
+.holo-card {
+  background: var(--deep);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s ease;
+}
+.holo-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(255,60,172,0.06) 0%,
+    rgba(249,115,22,0.04) 40%,
+    rgba(124,58,237,0.06) 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.holo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(249,115,22,0.25);
+}
+.holo-card:hover::before { opacity: 1; }
+
+/* ── Glowing border pill (role badge) ── */
+.role-badge {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, rgba(59,130,246,0.12), rgba(96,165,250,0.10));
+  border: 1px solid rgba(59,130,246,0.35);
+  color: var(--brand-blue-light);
+}
+
+/* ── Avatar ring with iridescent glow ── */
+.avatar-ring {
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: linear-gradient(var(--deep), var(--deep)) padding-box,
+              linear-gradient(135deg, var(--iris-1), var(--iris-4), var(--iris-2)) border-box;
+  transition: box-shadow 0.3s ease;
+}
+.holo-card:hover .avatar-ring {
+  box-shadow: 0 0 20px rgba(255,60,172,0.35);
+}
+
+/* ── Achievement timeline card ── */
+.ach-card {
+  background: var(--deep);
+  border-left: 3px solid transparent;
+  border-image: linear-gradient(to bottom, var(--iris-1), var(--iris-4)) 1;
+  border-radius: 0 14px 14px 0;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.ach-card:hover {
+  transform: translateX(6px);
+  box-shadow: -4px 0 24px rgba(255,60,172,0.2), 0 8px 40px rgba(0,0,0,0.4);
+}
+
+/* ── Timeline dot ── */
+.timeline-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--iris-1), var(--iris-2));
+  box-shadow: 0 0 8px rgba(255,60,172,0.6);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+/* ── Medal tag ── */
+.medal {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.medal-gold   { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+.medal-silver { background: rgba(148,163,184,0.15); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); }
+.medal-bronze { background: rgba(180,83,9,0.15);  color: #ea7c2a;  border: 1px solid rgba(180,83,9,0.3); }
+
+/* ── Section divider ── */
+.iris-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--iris-1), var(--iris-4), var(--iris-5), transparent);
+  opacity: 0.4;
+}
+
+/* ── Scroll fade-in ── */
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+.fade-in-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Nav link underline sweep ── */
+.nav-link {
+  position: relative;
+  color: #c8c3e8;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -3px; left: 0;
+  width: 0; height: 2px;
+  background: linear-gradient(90deg, var(--iris-1), var(--iris-2));
+  transition: width 0.3s ease;
+}
+.nav-link:hover { color: #fff; }
+.nav-link:hover::after { width: 100%; }
+
+/* ── CTA button ── */
+.btn-iris {
+  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 99px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, var(--iris-2), var(--iris-1));
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 4px 20px rgba(249,115,22,0.35);
+}
+.btn-iris:hover {
+  opacity: 0.92;
+  box-shadow: 0 6px 28px rgba(249,115,22,0.5);
+  transform: translateY(-1px);
+}
+
+/* ── Office bearers: hexagonal layout helper ── */
+.bearer-hex-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* ── Section heading accent ── */
+.section-eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--iris-2);
+  margin-bottom: 6px;
+}

@@ -1,0 +1,17 @@
+{
+  "name": "exp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+  "dev": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+  "build": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --minify"
+},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "tailwindcss": "^4.3.0"
+  }
+}
