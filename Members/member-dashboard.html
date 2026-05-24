@@ -334,7 +334,7 @@ function renderUpcomingEvents() {
   });
 }
 
-// Re-render calendar and events whenever admin updates localStorage from another tab
+// Re-render when admin updates events in another tab (works on https:// / GitHub Pages)
 window.addEventListener('storage', e => {
   if (e.key === 'rcn_events') { renderCal(); renderUpcomingEvents(); }
 });
